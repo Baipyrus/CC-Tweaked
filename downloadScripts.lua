@@ -2,7 +2,7 @@
 ---@field path string
 ---@field download_url string
 
-local ignored = { "downloadScripts.lua" }
+local ignored = { "downloadScripts.lua", "pastebin.lua" }
 local url = "https://api.github.com/repos/Baipyrus/CC-Tweaked/content/"
 print("Requesting content of repository:")
 print(url)
