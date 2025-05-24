@@ -5,7 +5,6 @@
 local ignored = { "downloadScripts.lua", "pastebin.lua" }
 local url = "https://api.github.com/repos/Baipyrus/CC-Tweaked/content/"
 print("Requesting content of repository:")
-print(url)
 
 local response = http.get(url)
 if response == nil then
