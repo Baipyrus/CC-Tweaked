@@ -4,16 +4,14 @@ local url = "https://raw.githubusercontent.com/Baipyrus/CC-Tweaked/main/" .. fil
 -- Request download script from GitHub
 local response = http.get(url)
 if response == nil then
-	print("Download repository request failed!")
-	os.exit()
+	error("Download repository request failed!")
 end
 
 local data = response.readAll()
 response.close()
 
 if data == nil then
-	print("Download script not found!")
-	os.exit()
+	error("Download script not found!")
 end
 
 -- Deleting existing file
@@ -24,8 +22,7 @@ end
 -- Try creating new file
 local f = fs.open(filename, "w")
 if f == nil then
-	print("Could not open file!")
-	os.exit()
+	error("Could not open file!")
 end
 
 -- Save new file

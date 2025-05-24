@@ -8,23 +8,20 @@ print("Requesting content of repository:")
 
 local response = http.get(url)
 if response == nil then
-	print("Repository content request failed!")
-	os.exit()
+	error("Repository content request failed!")
 end
 
 local data = response.readAll()
 response.close()
 
 if data == nil then
-	print("No repository content data found!")
-	os.exit()
+	error("No repository content data found!")
 end
 
 ---@type GitHub_Content[]|nil
 local content = textutils.unserialiseJSON(data)
 if content == nil then
-	print("Failed to unserialize content data!")
-	os.exit()
+	error("Failed to unserialize content data!")
 end
 print("Requesting files within repository:")
 
