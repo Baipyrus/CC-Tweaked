@@ -9,7 +9,7 @@ automation, provide utility functions, all to help in personal Minecraft experie
 To effortlessly download and set up all scripts directly within your Minecraft world,
 execute the following command in any CC: Tweaked computer or turtle:
 
-```lua
+```sh
 pastebin run 9kFK83aN
 ```
 
@@ -34,7 +34,7 @@ and easy to use. Here is a quick overview of all tools:
 After installation, you can run any script by entering its name in the
 CC: Tweaked terminal. For example:
 
-```lua
+```sh
 readPeripherals
 ```
 
