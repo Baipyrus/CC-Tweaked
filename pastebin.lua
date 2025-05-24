@@ -2,9 +2,9 @@ local filename = "downloadScripts.lua"
 local url = "https://raw.githubusercontent.com/Baipyrus/CC-Tweaked/main/" .. filename
 
 -- Request download script from GitHub
-local response = http.get(url)
+local response, message = http.get(url)
 if response == nil then
-	error("Download repository request failed!")
+	error("Repository content request failed: " .. message)
 end
 
 local data = response.readAll()

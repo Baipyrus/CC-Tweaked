@@ -6,9 +6,9 @@ local ignored = { "downloadScripts.lua", "pastebin.lua" }
 local url = "https://api.github.com/repos/Baipyrus/CC-Tweaked/content/"
 print("Requesting content of repository:")
 
-local response = http.get(url)
+local response, message = http.get(url)
 if response == nil then
-	error("Repository content request failed!")
+	error("Repository content request failed: " .. message)
 end
 
 local data = response.readAll()
