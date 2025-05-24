@@ -3,7 +3,7 @@
 ---@field download_url string
 
 local ignored = { "downloadScripts.lua", "pastebin.lua" }
-local url = "https://api.github.com/repos/Baipyrus/CC-Tweaked/content/"
+local url = "https://api.github.com/repos/Baipyrus/CC-Tweaked/contents/"
 print("Requesting content of repository:")
 
 local response, message = http.get(url)
