@@ -1,28 +1,34 @@
 term.clear()
 
+-- Get terminal dimensions
 local width, height = term.getSize()
+-- Subtract static content
 local linesPerPage = height - 5
 
 local sides = peripheral.getNames()
-local allLines = {}
+---@type table<string, string[]>, table<string, string[]>
+local pageLines, headerLines = {}, {}
 
 -- Convert all peripheral methods to
 for _, side in ipairs(sides) do
+	-- Initialize line tables
+	pageLines[side] = {}
+	headerLines[side] = {}
+
 	-- Set peripheral headers
 	local pType = peripheral.getType(side)
-	table.insert(allLines, "Side: " .. side)
-	table.insert(allLines, "Type: " .. pType)
-	table.insert(allLines, "")
+	table.insert(headerLines[side], "Side: " .. side)
+	table.insert(headerLines[side], "Type: " .. pType)
 
 	local methods = peripheral.getMethods(side)
 	if methods == nil then
-		table.insert(allLines, " (No methods found!)")
+		table.insert(pageLines[side], " (No methods found!)")
 		goto continue
 	end
 
 	-- Save peripheral methods in table
 	for _, m in ipairs(methods) do
-		table.insert(allLines, " - " .. m)
+		table.insert(pageLines[side], " - " .. m)
 	end
 
 	::continue::
@@ -30,21 +36,29 @@ end
 
 -- Main loop/logic
 local currentPage = 1
-local totalPages = math.ceil(#allLines / linesPerPage)
+local currentSide = "back"
 
 while true do
 	term.clear()
 	term.setCursorPos(1, 1)
 
+	-- Variables for current peripheral display
+	local currentLines = pageLines[currentSide]
+	local methodLines = linesPerPage - #headerLines[currentSide]
+	local methodPages = math.ceil(#currentLines / methodLines)
+
 	-- Print global headers
-	print("Peripherals (Page " .. currentPage .. "/" .. totalPages .. ")")
+	print("Peripherals (Page " .. currentPage .. "/" .. methodPages .. ")")
 	print(string.rep("-", width))
+
+	-- Print headers of current peripheral
+	print(table.concat(headerLines[currentSide], "\n"))
 
 	-- Print current page content
 	-- TODO: Page scrolling can break due to line wrap
-	local startLine = (currentPage - 1) * linesPerPage + 1
-	local endLine = math.min(startLine + linesPerPage - 1, #allLines)
-	print(table.concat(allLines, "\n", startLine, endLine))
+	local startLine = (currentPage - 1) * methodLines + 1
+	local endLine = math.min(startLine + methodLines - 1, #currentLines)
+	print(table.concat(currentLines, "\n", startLine, endLine))
 
 	-- Print global footers
 	print("\n[N] Next | [P] Previous | [Q] Quit")
@@ -55,7 +69,7 @@ while true do
 		term.clear()
 		term.setCursorPos(1, 1)
 		break
-	elseif key == keys.n and currentPage < totalPages then
+	elseif key == keys.n and currentPage < methodPages then
 		currentPage = currentPage + 1
 	elseif key == keys.p and currentPage > 1 then
 		currentPage = currentPage - 1
