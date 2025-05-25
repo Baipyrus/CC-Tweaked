@@ -4,6 +4,9 @@ local M = {}
 ---@type integer, integer, integer
 local width, height, linesPerPage
 
+--@type string
+local displayTitle
+
 ---@type string[], string[]
 local pageLines, headerLines = {}, {}
 
@@ -37,14 +40,18 @@ local function wrap_text_lines(lines, bullet)
 	return wrapped
 end
 
+---@param title string
 ---@param headers string[]
 ---@param content string[]
-function M.setup(headers, content)
+function M.setup(title, headers, content)
 	-- Get terminal dimensions
 	width, height = term.getSize()
 
 	-- Subtract static content
 	linesPerPage = height - 6
+
+	-- Save display title
+	displayTitle = title
 
 	-- Wrap text lines if necessary
 	pageLines = wrap_text_lines(content, true)
@@ -73,7 +80,7 @@ function M.display()
 		local methodPages = math.ceil(#pageLines / methodLines)
 
 		-- Print global headers
-		print("Peripherals (Page " .. currentPage .. "/" .. methodPages .. ")")
+		print(displayTitle .. ": (Page " .. currentPage .. "/" .. methodPages .. ")")
 		print(string.rep("-", width))
 
 		if #headerLines > 0 then
