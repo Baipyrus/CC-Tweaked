@@ -42,7 +42,7 @@ function M.setup(headers, content)
 	width, height = term.getSize()
 
 	-- Subtract static content
-	linesPerPage = height - 5
+	linesPerPage = height - 6
 
 	-- Wrap text lines if necessary
 	pageLines = wrap_text_lines(content)
@@ -82,9 +82,9 @@ function M.display()
 
 		-- Print global footers
 		local emptyLines = methodLines - (endLine - startLine)
-		print(string.rep("\n", emptyLines - 2))
-		print("[ENTER] Select | [↓] Next     | [↑] Previous")
-		print("[N]     Next   | [P] Previous | [Q] Quit    ")
+		print(string.rep("\n", emptyLines - 1))
+		print("[ENTER] Select | [UP] Next    | [DOWN] Previous")
+		print("[N]     Next   | [P] Previous | [Q] Quit       ")
 
 		-- Event handler: scroll pages or quit
 		local _, key = os.pullEvent("key")
