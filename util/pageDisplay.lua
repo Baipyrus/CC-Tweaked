@@ -49,17 +49,23 @@ function M.setup(headers, content)
 	headerLines = wrap_text_lines(headers)
 end
 
+---@param s string
+---@param prefix string
+function string.startswith(s, prefix)
+	return s:sub(0, #prefix) == prefix
+end
+
 function M.display()
 	local currentPage = 1
+	local currentSelect = 1
 
 	while true do
 		term.clear()
 		term.setCursorPos(1, 1)
 
 		-- Variables for current peripheral display
-		local currentLines = pageLines
 		local methodLines = linesPerPage - #headerLines - 1
-		local methodPages = math.ceil(#currentLines / methodLines)
+		local methodPages = math.ceil(#pageLines / methodLines)
 
 		-- Print global headers
 		print("Peripherals (Page " .. currentPage .. "/" .. methodPages .. ")")
@@ -71,13 +77,14 @@ function M.display()
 
 		-- Print current page content
 		local startLine = (currentPage - 1) * methodLines + 1
-		local endLine = math.min(startLine + methodLines - 1, #currentLines)
-		print(table.concat(currentLines, "\n", startLine, endLine))
+		local endLine = math.min(startLine + methodLines - 1, #pageLines)
+		print(table.concat(pageLines, "\n", startLine, endLine))
 
 		-- Print global footers
-		local emptyLines = methodLines - (endLine - startLine) - 1
-		print(string.rep("\n", emptyLines))
-		print("[N] Next | [P] Previous | [Q] Quit")
+		local emptyLines = methodLines - (endLine - startLine)
+		print(string.rep("\n", emptyLines - 2))
+		print("[ENTER] Select | [↓] Next     | [↑] Previous")
+		print("[N]     Next   | [P] Previous | [Q] Quit    ")
 
 		-- Event handler: scroll pages or quit
 		local _, key = os.pullEvent("key")
@@ -89,6 +96,24 @@ function M.display()
 			currentPage = currentPage + 1
 		elseif key == keys.p and currentPage > 1 then
 			currentPage = currentPage - 1
+		elseif key == keys.up or key == keys.down then
+			pageLines[currentSelect] = " -" .. pageLines[currentSelect]:sub(3)
+
+			while true do
+				if key == keys.up and currentSelect < methodLines then
+					currentSelect = currentSelect + 1
+				elseif key == keys.down and currentSelect > 1 then
+					currentSelect = currentSelect - 1
+				else
+					error("Could not find nearest bulletpoint!")
+				end
+
+				if pageLines[currentSelect]:startswith(" - ") then
+					break
+				end
+			end
+
+			pageLines[currentSelect] = " *" .. pageLines[currentSelect]:sub(3)
 		end
 	end
 end
