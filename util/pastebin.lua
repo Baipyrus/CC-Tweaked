@@ -1,4 +1,4 @@
-local filename = "downloadScripts.lua"
+local filename = "util/downloadScripts.lua"
 local url = "https://raw.githubusercontent.com/Baipyrus/CC-Tweaked/main/" .. filename
 
 -- Request download script from GitHub
