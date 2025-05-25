@@ -61,6 +61,9 @@ function M.display()
 	local currentPage = 1
 	local currentSelect = 1
 
+	-- Set initial bulletpoint as selected
+	pageLines[currentSelect] = " *" .. pageLines[currentSelect]:sub(3)
+
 	while true do
 		term.clear()
 		term.setCursorPos(1, 1)
@@ -88,7 +91,7 @@ function M.display()
 		print("[ENTER] Select | [UP] Next    | [DOWN] Previous")
 		print("[N]     Next   | [P] Previous | [Q] Quit       ")
 
-		-- Event handler: scroll pages or quit
+		---@type _, string
 		local _, key = os.pullEvent("key")
 		if key == keys.q then
 			term.clear()
@@ -98,13 +101,13 @@ function M.display()
 			currentPage = currentPage + 1
 		elseif key == keys.p and currentPage > 1 then
 			currentPage = currentPage - 1
-		elseif key == keys.up or key == keys.down then
+		elseif key == keys.up or key == keys.down and currentSelect < methodLines and currentSelect > 1 then
 			pageLines[currentSelect] = " -" .. pageLines[currentSelect]:sub(3)
 
 			while true do
-				if key == keys.up and currentSelect < methodLines then
+				if key == keys.down and currentSelect < methodLines then
 					currentSelect = currentSelect + 1
-				elseif key == keys.down and currentSelect > 1 then
+				elseif key == keys.up and currentSelect > 1 then
 					currentSelect = currentSelect - 1
 				else
 					error("Could not find nearest bulletpoint!")
