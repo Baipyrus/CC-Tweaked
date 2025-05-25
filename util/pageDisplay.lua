@@ -97,9 +97,11 @@ function M.display()
 		local keyUpLogic = key == keys.up and currentSelect > 1
 		local keyDownLogic = key == keys.down and currentSelect < methodLines
 
+		-- Select next real entry in 'pageLines'
 		if keyUpLogic or keyDownLogic then
 			pageLines[currentSelect] = " -" .. pageLines[currentSelect]:sub(3)
 
+			-- Find next entry (containing leading dash)
 			while true do
 				if key == keys.down and currentSelect < methodLines then
 					currentSelect = currentSelect + 1
@@ -116,12 +118,15 @@ function M.display()
 
 			pageLines[currentSelect] = " *" .. pageLines[currentSelect]:sub(3)
 		elseif key == keys.q then
+			-- Quit current menu
 			term.clear()
 			term.setCursorPos(1, 1)
 			break
 		elseif key == keys.n and currentPage < methodPages then
+			-- Scroll next page
 			currentPage = currentPage + 1
 		elseif key == keys.p and currentPage > 1 then
+			-- Scroll previous page
 			currentPage = currentPage - 1
 		end
 
