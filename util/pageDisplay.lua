@@ -86,8 +86,13 @@ function M.display()
 		term.clear()
 		term.setCursorPos(1, 1)
 
+		-- Less spacing necessary if no headers provided
+		local headerSpacing = #headerLines > 0 and 2 or 1
+		-- Replacing keymap legend on small screens
+		local hideLegend = width < 48 and 4 or 0
+
 		-- Variables for current peripheral display
-		local methodLines = linesPerPage - #headerLines - 1
+		local methodLines = linesPerPage - #headerLines - 1 + hideLegend
 		local methodPages = math.ceil(#pageLines / methodLines)
 
 		-- Print global headers
@@ -105,14 +110,9 @@ function M.display()
 		local endLine = math.min(startLine + methodLines - 1, #pageLines)
 		print(table.concat(pageLines, "\n", startLine, endLine))
 
-		-- Less spacing necessary if no headers provided
-		local headerSpacing = #headerLines > 0 and 2 or 1
-		-- Replacing keymap legend on small screens
-		local hideLegend = width < 48 and 2 or 0
-
 		-- Print global footers
 		local displayLines = endLine - startLine + headerSpacing
-		local emptyLines = methodLines - displayLines + 2 + hideLegend
+		local emptyLines = methodLines - displayLines + 2
 		print(string.rep("\n", emptyLines - 1))
 
 		if width >= 48 then
