@@ -1,28 +1,44 @@
 ---@class GitHub_Content
+---@field name string
 ---@field path string
+---@field type string
 ---@field download_url string
 
 local ignored = { "downloadScripts.lua", "pastebin.lua" }
-local url = "https://api.github.com/repos/Baipyrus/CC-Tweaked/contents/"
+local repoURL = "https://api.github.com/repos/Baipyrus/CC-Tweaked/contents/"
 print("Requesting content of repository:")
 
-local response, message = http.get(url)
-if response == nil then
-	error("Repository content request failed: " .. message)
+---@param url string
+---@param dataOnly? boolean
+---@return GitHub_Content[]|string
+local function repo_content_request(url, dataOnly)
+	local response, message = http.get(url)
+	if response == nil then
+		error("Repository content request failed: " .. message)
+	end
+
+	local data = response.readAll()
+	response.close()
+
+	if data == nil then
+		error("No repository content data found!")
+	end
+
+	if dataOnly == true then
+		return data
+	end
+
+	---@type GitHub_Content[]|nil
+	local content = textutils.unserialiseJSON(data)
+	if content == nil then
+		error("Failed to unserialize content data!")
+	end
+
+	return content
 end
 
-local data = response.readAll()
-response.close()
-
-if data == nil then
-	error("No repository content data found!")
-end
-
----@type GitHub_Content[]|nil
-local content = textutils.unserialiseJSON(data)
-if content == nil then
-	error("Failed to unserialize content data!")
-end
+local repoContent = repo_content_request(repoURL)
+assert(type(repoContent) == "table", "Expected 'GitHub_Content[]' from request result!")
 print("Requesting files within repository:")
 
 ---@param s string
@@ -44,7 +60,7 @@ local function string_table_idx(tbl, item)
 	return -1
 end
 
-for _, file in ipairs(content) do
+for _, file in ipairs(repoContent) do
 	-- Ignore conditions for some files
 	local wrong_ext = not file.path:endswith(".lua")
 	local is_ignored = string_table_idx(ignored, file.path) ~= -1
@@ -60,12 +76,8 @@ for _, file in ipairs(content) do
 		print("Downloading file '" .. file.path .. "' ...")
 	end
 
-	-- Using 'assert' because of previously established connection
-	local r = http.get(file.download_url)
-	assert(r ~= nil, "Panic: Could not establish connection to get file " .. file.path)
-	local d = r.readAll()
-	r.close()
-	assert(d ~= nil, "Panic: Could not read file " .. file.path)
+	local d = repo_content_request(file.download_url)
+	assert(type(repoContent) == "string", "Expected 'string' from request result!")
 
 	-- Try creating new file
 	local f = fs.open(file.path, "w")
