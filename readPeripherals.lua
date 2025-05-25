@@ -1,11 +1,20 @@
 local pageDisplay = require("util.pageDisplay")
 
 ---@type table<string, string[]>, table<string, string[]>
-local pageLines, headerLines = {}, {}
+local pageLines, headerLines
+
+---@type function[]
+local lineCallbacks = {}
 
 -- Convert all peripheral methods to
 local sides = peripheral.getNames()
 for _, side in ipairs(sides) do
+    -- Push pager display callback for current side
+    table.insert(lineCallbacks, function ()
+        pageDisplay.setup("P. Methods", headerLines[side], pageLines[side])
+        pageDisplay.display()
+    end)
+
 	-- Initialize line tables
 	headerLines[side] = {}
 
@@ -26,8 +35,5 @@ for _, side in ipairs(sides) do
 	::continue::
 end
 
-pageDisplay.setup("Peripherals", {}, sides)
+pageDisplay.setup("Peripherals", {}, sides, lineCallbacks)
 pageDisplay.display()
-
--- pageDisplay.setup("P. Methods", headerLines["back"], pageLines["back"])
--- pageDisplay.display()
