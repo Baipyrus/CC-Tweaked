@@ -95,7 +95,8 @@ function M.display()
 		print(table.concat(pageLines, "\n", startLine, endLine))
 
 		-- Print global footers
-		local emptyLines = methodLines - (endLine - startLine)
+		local displayLines = endLine - startLine + 1
+		local emptyLines = methodLines - displayLines + 2
 		print(string.rep("\n", emptyLines - 1))
 		print("[ENTER] Select | [UP] Next    | [DOWN] Previous")
 		print("[N]     Next   | [P] Previous | [Q] Quit       ")
@@ -104,7 +105,7 @@ function M.display()
 		local _, key = os.pullEvent("key")
 
 		local keyUpLogic = key == keys.up and currentSelect > 1
-		local keyDownLogic = key == keys.down and currentSelect < methodLines
+		local keyDownLogic = key == keys.down and currentSelect < displayLines
 
 		-- Select next real entry in 'pageLines'
 		if keyUpLogic or keyDownLogic then
@@ -112,7 +113,7 @@ function M.display()
 
 			-- Find next entry (containing leading dash)
 			while true do
-				if key == keys.down and currentSelect < methodLines then
+				if key == keys.down and currentSelect < displayLines then
 					currentSelect = currentSelect + 1
 				elseif key == keys.up and currentSelect > 1 then
 					currentSelect = currentSelect - 1
