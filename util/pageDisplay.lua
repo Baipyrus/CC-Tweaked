@@ -76,9 +76,11 @@ function M.display()
 		print("Peripherals (Page " .. currentPage .. "/" .. methodPages .. ")")
 		print(string.rep("-", width))
 
-		-- Print headers of current peripheral
-		print(table.concat(headerLines, "\n"))
-		print()
+		if #headerLines > 0 then
+			-- Print headers of current peripheral
+			print(table.concat(headerLines, "\n"))
+			print()
+		end
 
 		-- Print current page content
 		local startLine = (currentPage - 1) * methodLines + 1
