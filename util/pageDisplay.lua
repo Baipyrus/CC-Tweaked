@@ -8,20 +8,26 @@ local width, height, linesPerPage
 local displayTitle
 
 ---@type string[], string[]
-local pageLines, headerLines = {}, {}
+local headerLines, pageLines
+
+---@type integer[], function[]
+local callbackIndex, lineCallbacks
 
 ---@param bullet? boolean
 ---@param lines string[]
 local function wrap_text_lines(lines, bullet)
 	---@type string[]
 	local wrapped = {}
+	---@type integer[]
+	local map = {}
 
-	for _, l in ipairs(lines) do
+	for i, l in ipairs(lines) do
 		local current = bullet and " - " .. l or l
 
 		-- Save peripheral methods in table
 		if #current <= width then
 			table.insert(wrapped, current)
+			table.insert(map, i)
 			goto skip
 		end
 
@@ -29,6 +35,7 @@ local function wrap_text_lines(lines, bullet)
 		while #current > 0 do
 			local c1 = current:sub(0, width)
 			table.insert(wrapped, c1)
+			table.insert(map, i)
 
 			local c2 = current:sub(width + 1)
 			current = bullet and "   " .. c2 or c2
@@ -37,13 +44,14 @@ local function wrap_text_lines(lines, bullet)
 		::skip::
 	end
 
-	return wrapped
+	return wrapped, map
 end
 
 ---@param title string
 ---@param headers string[]
 ---@param content string[]
-function M.setup(title, headers, content)
+---@param callbacks? function[]
+function M.setup(title, headers, content, callbacks)
 	-- Get terminal dimensions
 	width, height = term.getSize()
 
@@ -54,8 +62,11 @@ function M.setup(title, headers, content)
 	displayTitle = title
 
 	-- Wrap text lines if necessary
-	pageLines = wrap_text_lines(content, true)
+	pageLines, callbackIndex = wrap_text_lines(content, true)
 	headerLines = wrap_text_lines(headers)
+
+	-- Save callback functions
+	lineCallbacks = callbacks or {}
 end
 
 ---@param s string
@@ -131,6 +142,16 @@ function M.display()
 			-- Quit current menu
 			term.clear()
 			term.setCursorPos(1, 1)
+			break
+		elseif key == keys.enter then
+			-- Clear, run callback method and exit
+			term.clear()
+			term.setCursorPos(1, 1)
+
+			local idx = callbackIndex[currentSelect]
+			local cbak = lineCallbacks[idx]
+			cbak()
+
 			break
 		elseif key == keys.n and currentPage < methodPages then
 			-- Scroll next page
