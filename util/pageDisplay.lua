@@ -93,15 +93,11 @@ function M.display()
 
 		---@type _, string
 		local _, key = os.pullEvent("key")
-		if key == keys.q then
-			term.clear()
-			term.setCursorPos(1, 1)
-			break
-		elseif key == keys.n and currentPage < methodPages then
-			currentPage = currentPage + 1
-		elseif key == keys.p and currentPage > 1 then
-			currentPage = currentPage - 1
-		elseif key == keys.up or key == keys.down and currentSelect < methodLines and currentSelect > 1 then
+
+		local keyUpLogic = key == keys.up and currentSelect > 1
+		local keyDownLogic = key == keys.down and currentSelect < methodLines
+
+		if keyUpLogic or keyDownLogic then
 			pageLines[currentSelect] = " -" .. pageLines[currentSelect]:sub(3)
 
 			while true do
@@ -119,6 +115,14 @@ function M.display()
 			end
 
 			pageLines[currentSelect] = " *" .. pageLines[currentSelect]:sub(3)
+		elseif key == keys.q then
+			term.clear()
+			term.setCursorPos(1, 1)
+			break
+		elseif key == keys.n and currentPage < methodPages then
+			currentPage = currentPage + 1
+		elseif key == keys.p and currentPage > 1 then
+			currentPage = currentPage - 1
 		end
 	end
 end
