@@ -26,9 +26,24 @@ for _, side in ipairs(sides) do
 		goto continue
 	end
 
-	-- Save peripheral methods in table
 	for _, m in ipairs(methods) do
-		table.insert(pageLines[side], " - " .. m)
+		local methodLine = " - " .. m
+
+		-- Save peripheral methods in table
+		if #methodLine <= width then
+			table.insert(pageLines[side], methodLine)
+			goto skip
+		end
+
+		-- Split line with wrap to account for page scrolling
+		while #methodLine > 0 do
+			local lineSplit = methodLine:sub(0, width)
+			table.insert(pageLines[side], lineSplit)
+
+			methodLine = methodLine:sub(width + 1)
+		end
+
+		::skip::
 	end
 
 	::continue::
