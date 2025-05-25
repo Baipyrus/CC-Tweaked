@@ -1,7 +1,7 @@
 term.clear()
--- Base height of built-in computer display
--- TODO: Detect display/monitor width?
-local linesPerPage = 14
+
+local width, height = term.getSize()
+local linesPerPage = height - 5
 
 local sides = peripheral.getNames()
 local allLines = {}
@@ -38,7 +38,7 @@ while true do
 
 	-- Print global headers
 	print("Peripherals (Page " .. currentPage .. "/" .. totalPages .. ")")
-	print("--------------------------------")
+	print(string.rep("-", width))
 
 	-- Print current page content
 	-- TODO: Page scrolling can break due to line wrap
