@@ -59,7 +59,7 @@ while true do
 
 	-- Variables for current peripheral display
 	local currentLines = pageLines[currentSide]
-	local methodLines = linesPerPage - #headerLines[currentSide]
+	local methodLines = linesPerPage - #headerLines[currentSide] - 1
 	local methodPages = math.ceil(#currentLines / methodLines)
 
 	-- Print global headers
@@ -68,15 +68,17 @@ while true do
 
 	-- Print headers of current peripheral
 	print(table.concat(headerLines[currentSide], "\n"))
+	print()
 
 	-- Print current page content
-	-- TODO: Page scrolling can break due to line wrap
 	local startLine = (currentPage - 1) * methodLines + 1
 	local endLine = math.min(startLine + methodLines - 1, #currentLines)
 	print(table.concat(currentLines, "\n", startLine, endLine))
 
 	-- Print global footers
-	print("\n[N] Next | [P] Previous | [Q] Quit")
+	local emptyLines = methodLines - (endLine - startLine) - 1
+	print(string.rep("\n", emptyLines))
+	print("[N] Next | [P] Previous | [Q] Quit")
 
 	-- Event handler: scroll pages or quit
 	local _, key = os.pullEvent("key")
