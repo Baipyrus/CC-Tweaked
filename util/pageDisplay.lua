@@ -106,7 +106,7 @@ function M.display()
 		print(table.concat(pageLines, "\n", startLine, endLine))
 
 		-- Print global footers
-		local displayLines = endLine - startLine + 1
+		local displayLines = endLine - startLine + (#headerLines > 0 and 2 or 1)
 		local emptyLines = methodLines - displayLines + 2
 		print(string.rep("\n", emptyLines - 1))
 		print("[ENTER] Select | [UP] Next     | [DOWN] Previous")
