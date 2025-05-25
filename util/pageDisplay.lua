@@ -7,13 +7,14 @@ local width, height, linesPerPage
 ---@type string[], string[]
 local pageLines, headerLines = {}, {}
 
+---@param bullet? boolean
 ---@param lines string[]
-local function wrap_text_lines(lines)
+local function wrap_text_lines(lines, bullet)
 	---@type string[]
 	local wrapped = {}
 
 	for _, l in ipairs(lines) do
-		local current = l .. " - "
+		local current = bullet and l .. " - " or l
 
 		-- Save peripheral methods in table
 		if #current <= width then
@@ -23,10 +24,11 @@ local function wrap_text_lines(lines)
 
 		-- Split line with wrap to account for page scrolling
 		while #current > 0 do
-			local lineSplit = current:sub(0, width)
-			table.insert(wrapped, lineSplit)
+			local c1 = current:sub(0, width)
+			table.insert(wrapped, c1)
 
-			current = "   " .. current:sub(width + 1)
+			local c2 = current:sub(width + 1)
+			current = bullet and "   " .. c2 or c2
 		end
 
 		::skip::
@@ -45,7 +47,7 @@ function M.setup(headers, content)
 	linesPerPage = height - 6
 
 	-- Wrap text lines if necessary
-	pageLines = wrap_text_lines(content)
+	pageLines = wrap_text_lines(content, true)
 	headerLines = wrap_text_lines(headers)
 end
 
