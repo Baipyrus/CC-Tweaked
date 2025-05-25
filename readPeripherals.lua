@@ -1,7 +1,7 @@
 local pageDisplay = require("util.pageDisplay")
 
 ---@type table<string, string[]>, table<string, string[]>
-local pageLines, headerLines
+local pageLines, headerLines = {}, {}
 
 ---@type function[]
 local lineCallbacks = {}
