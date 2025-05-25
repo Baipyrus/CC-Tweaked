@@ -124,6 +124,13 @@ function M.display()
 		elseif key == keys.p and currentPage > 1 then
 			currentPage = currentPage - 1
 		end
+
+		-- Reset current selection on page scroll
+		if key == keys.n or key == keys.p then
+			pageLines[currentSelect] = " -" .. pageLines[currentSelect]:sub(3)
+			currentSelect = 1
+			pageLines[currentSelect] = " *" .. pageLines[currentSelect]:sub(3)
+		end
 	end
 end
 
