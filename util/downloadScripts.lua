@@ -88,7 +88,7 @@ for _, file in ipairs(repoContent) do
 		print("Downloading file '" .. file.path .. "' ...")
 	end
 
-	local d = repo_content_request(file.download_url)
+	local d = repo_content_request(file.download_url, true)
 	assert(type(repoContent) == "string", "Expected 'string' from request result!")
 
 	-- Try creating new file
