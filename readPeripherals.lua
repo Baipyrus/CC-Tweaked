@@ -27,3 +27,4 @@ for _, side in ipairs(sides) do
 end
 
 pageDisplay.setup(headerLines["back"], pageLines["back"])
+pageDisplay.display()
