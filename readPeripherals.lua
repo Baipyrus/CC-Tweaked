@@ -1,15 +1,10 @@
-term.clear()
+local pageDisplay = require("util.pageDisplay")
 
--- Get terminal dimensions
-local width, height = term.getSize()
--- Subtract static content
-local linesPerPage = height - 5
-
-local sides = peripheral.getNames()
 ---@type table<string, string[]>, table<string, string[]>
 local pageLines, headerLines = {}, {}
 
 -- Convert all peripheral methods to
+local sides = peripheral.getNames()
 for _, side in ipairs(sides) do
 	-- Initialize line tables
 	pageLines[side] = {}
@@ -26,69 +21,12 @@ for _, side in ipairs(sides) do
 		goto continue
 	end
 
+	-- Save peripheral methods in table
 	for _, m in ipairs(methods) do
-		local methodLine = " - " .. m
-
-		-- Save peripheral methods in table
-		if #methodLine <= width then
-			table.insert(pageLines[side], methodLine)
-			goto skip
-		end
-
-		-- Split line with wrap to account for page scrolling
-		while #methodLine > 0 do
-			local lineSplit = methodLine:sub(0, width)
-			table.insert(pageLines[side], lineSplit)
-
-			methodLine = methodLine:sub(width + 1)
-		end
-
-		::skip::
+		table.insert(pageLines[side], " - " .. m)
 	end
 
 	::continue::
 end
 
--- Main loop/logic
-local currentPage = 1
-local currentSide = "back"
-
-while true do
-	term.clear()
-	term.setCursorPos(1, 1)
-
-	-- Variables for current peripheral display
-	local currentLines = pageLines[currentSide]
-	local methodLines = linesPerPage - #headerLines[currentSide] - 1
-	local methodPages = math.ceil(#currentLines / methodLines)
-
-	-- Print global headers
-	print("Peripherals (Page " .. currentPage .. "/" .. methodPages .. ")")
-	print(string.rep("-", width))
-
-	-- Print headers of current peripheral
-	print(table.concat(headerLines[currentSide], "\n"))
-	print()
-
-	-- Print current page content
-	local startLine = (currentPage - 1) * methodLines + 1
-	local endLine = math.min(startLine + methodLines - 1, #currentLines)
-	print(table.concat(currentLines, "\n", startLine, endLine))
-
-	-- Print global footers
-	local emptyLines = methodLines - (endLine - startLine) - 1
-	print(string.rep("\n", emptyLines))
-	print("[N] Next | [P] Previous | [Q] Quit")
-
-	-- Event handler: scroll pages or quit
-	local _, key = os.pullEvent("key")
-	if key == keys.q then
-		term.clear()
-		term.setCursorPos(1, 1)
-		break
-	elseif key == keys.n and currentPage < methodPages then
-		currentPage = currentPage + 1
-	elseif key == keys.p and currentPage > 1 then
-		currentPage = currentPage - 1
-	end
-end
+pageDisplay.setup(headerLines["back"], pageDisplay["back"])
