@@ -7,7 +7,6 @@ local pageLines, headerLines = {}, {}
 local sides = peripheral.getNames()
 for _, side in ipairs(sides) do
 	-- Initialize line tables
-	pageLines[side] = {}
 	headerLines[side] = {}
 
 	-- Set peripheral headers
@@ -22,9 +21,7 @@ for _, side in ipairs(sides) do
 	end
 
 	-- Save peripheral methods in table
-	for _, m in ipairs(methods) do
-		table.insert(pageLines[side], " - " .. m)
-	end
+    pageLines[side] = methods
 
 	::continue::
 end

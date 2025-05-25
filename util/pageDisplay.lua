@@ -13,7 +13,7 @@ local function wrap_text_lines(lines)
 	local wrapped = {}
 
 	for _, l in ipairs(lines) do
-		local current = l
+		local current = l .. " - "
 
 		-- Save peripheral methods in table
 		if #current <= width then
@@ -26,7 +26,7 @@ local function wrap_text_lines(lines)
 			local lineSplit = current:sub(0, width)
 			table.insert(wrapped, lineSplit)
 
-			current = current:sub(width + 1)
+			current = "   " .. current:sub(width + 1)
 		end
 
 		::skip::
