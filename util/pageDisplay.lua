@@ -32,7 +32,7 @@ local function wrap_text_lines(lines, bullet)
 		end
 
 		-- Split line with wrap to account for page scrolling
-		while #current > 0 do
+		while #current > 3 do
 			local c1 = current:sub(0, width)
 			table.insert(wrapped, c1)
 			table.insert(map, i)
