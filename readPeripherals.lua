@@ -9,14 +9,10 @@ local lineCallbacks = {}
 -- Convert all peripheral methods to
 local sides = peripheral.getNames()
 for _, side in ipairs(sides) do
-    -- Push pager display callback for current side
-    table.insert(lineCallbacks, function ()
-        pageDisplay.setup("P. Methods", headerLines[side], pageLines[side])
-        pageDisplay.display()
-    end)
 
 	-- Initialize line tables
 	headerLines[side] = {}
+	pageLines[side] = {}
 
 	-- Set peripheral headers
 	local pType = peripheral.getType(side)
@@ -30,9 +26,15 @@ for _, side in ipairs(sides) do
 	end
 
 	-- Save peripheral methods in table
-    pageLines[side] = methods
+	pageLines[side] = methods
 
 	::continue::
+
+	-- Push pager display callback for current side
+	table.insert(lineCallbacks, function ()
+		pageDisplay.setup("P. Methods", headerLines[side], pageLines[side])
+		pageDisplay.display()
+	end)
 end
 
 pageDisplay.setup("Peripherals", {}, sides, lineCallbacks)
