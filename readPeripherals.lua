@@ -26,5 +26,8 @@ for _, side in ipairs(sides) do
 	::continue::
 end
 
-pageDisplay.setup(headerLines["back"], pageLines["back"])
+pageDisplay.setup("Peripherals", {}, sides)
 pageDisplay.display()
+
+-- pageDisplay.setup("P. Methods", headerLines["back"], pageLines["back"])
+-- pageDisplay.display()
