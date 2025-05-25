@@ -89,7 +89,7 @@ function M.display()
 		-- Less spacing necessary if no headers provided
 		local headerSpacing = #headerLines > 0 and 2 or 1
 		-- Replacing keymap legend on small screens
-		local hideLegend = width < 48 and 4 or 0
+		local hideLegend = width < 48 and 2 or 0
 
 		-- Variables for current peripheral display
 		local methodLines = linesPerPage - #headerLines - 1 + hideLegend
