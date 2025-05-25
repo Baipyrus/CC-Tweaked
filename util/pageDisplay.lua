@@ -98,8 +98,8 @@ function M.display()
 		local displayLines = endLine - startLine + 1
 		local emptyLines = methodLines - displayLines + 2
 		print(string.rep("\n", emptyLines - 1))
-		print("[ENTER] Select | [UP] Next    | [DOWN] Previous")
-		print("[N]     Next   | [P] Previous | [Q] Quit       ")
+		print("[ENTER] Select | [UP] Next     | [DOWN] Previous")
+		print("[N]     Next   | [P]  Previous | [Q]    Quit    ")
 
 		---@type _, string
 		local _, key = os.pullEvent("key")
