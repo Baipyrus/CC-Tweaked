@@ -105,12 +105,20 @@ function M.display()
 		local endLine = math.min(startLine + methodLines - 1, #pageLines)
 		print(table.concat(pageLines, "\n", startLine, endLine))
 
+		-- Less spacing necessary if no headers provided
+		local headerSpacing = #headerLines > 0 and 2 or 1
+		-- Replacing keymap legend on small screens
+		local hideLegend = width < 48 and 2 or 0
+
 		-- Print global footers
-		local displayLines = endLine - startLine + (#headerLines > 0 and 2 or 1)
-		local emptyLines = methodLines - displayLines + 2
+		local displayLines = endLine - startLine + headerSpacing
+		local emptyLines = methodLines - displayLines + 2 + hideLegend
 		print(string.rep("\n", emptyLines - 1))
-		print("[ENTER] Select | [UP] Next     | [DOWN] Previous")
-		print("[N]     Next   | [P]  Previous | [Q]    Quit    ")
+
+		if width >= 48 then
+			print("[ENTER] Select | [UP] Next     | [DOWN] Previous")
+			print("[N]     Next   | [P]  Previous | [Q]    Quit    ")
+		end
 
 		---@type _, string
 		local _, key = os.pullEvent("key")
