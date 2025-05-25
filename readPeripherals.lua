@@ -29,4 +29,4 @@ for _, side in ipairs(sides) do
 	::continue::
 end
 
-pageDisplay.setup(headerLines["back"], pageDisplay["back"])
+pageDisplay.setup(headerLines["back"], pageLines["back"])
