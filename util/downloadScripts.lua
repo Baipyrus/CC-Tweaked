@@ -89,7 +89,7 @@ for _, file in ipairs(repoContent) do
 	end
 
 	local d = repo_content_request(file.download_url, true)
-	assert(type(repoContent) == "string", "Expected 'string' from request result!")
+	assert(type(d) == "string", "Expected 'string' from request result!")
 
 	-- Try creating new file
 	local f = fs.open(file.path, "w")
