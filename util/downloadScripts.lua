@@ -1,4 +1,5 @@
 ---@class GitHub_Content
+---@field url string
 ---@field name string
 ---@field path string
 ---@field type string
@@ -61,6 +62,17 @@ local function string_table_idx(tbl, item)
 end
 
 for _, file in ipairs(repoContent) do
+	-- Scan subdirectory content
+	if file.type == "dir" then
+		local subDir = repo_content_request(file.url)
+		assert(type(subDir) == "table", "Expected 'GitHub_Content[]' from request result!")
+
+		-- Extend repo content by subdir children
+		table.move(subDir, 1, #subDir, #repoContent + 1, repoContent)
+
+		goto continue
+	end
+
 	-- Ignore conditions for some files
 	local wrong_ext = not file.path:endswith(".lua")
 	local is_ignored = string_table_idx(ignored, file.path) ~= -1
