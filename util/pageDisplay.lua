@@ -14,7 +14,7 @@ local function wrap_text_lines(lines, bullet)
 	local wrapped = {}
 
 	for _, l in ipairs(lines) do
-		local current = bullet and l .. " - " or l
+		local current = bullet and " - " .. l or l
 
 		-- Save peripheral methods in table
 		if #current <= width then
