@@ -161,7 +161,7 @@ local function inputHandler(currentSelect, currentPage, contentLength)
 		currentSelect = key == keys.n and endLine or startLine
 
 		startLine, endLine = getPageIndecies(currentPage, contentLength, #pageLines)
-		currentSelect = calculateSelection(key == keys.n, currentSelect, startLine, endLine)
+		currentSelect = calculateSelection(key == keys.p, currentSelect, startLine, endLine)
 	end
 
 	return false, currentSelect, currentPage
