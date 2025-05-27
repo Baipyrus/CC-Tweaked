@@ -125,6 +125,7 @@ function M.display()
 
 		local keyUpLogic = key == keys.up and currentSelect > startLine
 		local keyDownLogic = key == keys.down and currentSelect < endLine
+		local pageScrollFlag = false
 
 		-- Select next real entry in 'pageLines'
 		if keyUpLogic or keyDownLogic then
@@ -159,9 +160,18 @@ function M.display()
 		elseif key == keys.n and currentPage < methodPages then
 			-- Scroll next page
 			currentPage = currentPage + 1
+			pageScrollFlag = true
 		elseif key == keys.p and currentPage > 1 then
 			-- Scroll previous page
 			currentPage = currentPage - 1
+			pageScrollFlag = true
+		end
+
+		-- Reset current selection on page scroll
+		if pageScrollFlag then
+			pageLines[currentSelect] = " -" .. pageLines[currentSelect]:sub(3)
+			currentSelect = key == keys.n and endLine + 1 or startLine - 1
+			pageLines[currentSelect] = " *" .. pageLines[currentSelect]:sub(3)
 		end
 	end
 end
