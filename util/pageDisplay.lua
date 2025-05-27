@@ -56,7 +56,7 @@ function M.setup(title, headers, content, callbacks)
 	width, height = term.getSize()
 
 	-- Subtract static content
-	linesPerPage = height - 6
+	linesPerPage = height - 4
 
 	-- Save display title
 	displayTitle = title
