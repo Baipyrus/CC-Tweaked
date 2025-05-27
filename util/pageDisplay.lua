@@ -89,10 +89,10 @@ function M.display()
 		-- Less spacing necessary if no headers provided
 		local headerSpacing = #headerLines > 0 and 2 or 1
 		-- Replacing keymap legend on small screens
-		local hideLegend = width < 48 and 2 or 0
+		local legendLines = width >= 48 and 2 or 0
 
 		-- Variables for current peripheral display
-		local methodLines = linesPerPage - #headerLines - 1 + hideLegend
+		local methodLines = linesPerPage - #headerLines - 1 - legendLines
 		local methodPages = math.ceil(#pageLines / methodLines)
 
 		-- Print global headers
@@ -115,7 +115,7 @@ function M.display()
 		local emptyLines = methodLines - displayLines + 2
 		print(string.rep("\n", emptyLines - 1))
 
-		if width >= 48 then
+		if legendLines > 0 then
 			print("[ENTER] Select | [UP] Next     | [DOWN] Previous")
 			print("[N]     Next   | [P]  Previous | [Q]    Quit    ")
 		end
@@ -123,8 +123,8 @@ function M.display()
 		---@type _, string
 		local _, key = os.pullEvent("key")
 
-		local keyUpLogic = key == keys.up and currentSelect > 1
-		local keyDownLogic = key == keys.down and currentSelect < displayLines
+		local keyUpLogic = key == keys.up and currentSelect > startLine
+		local keyDownLogic = key == keys.down and currentSelect < endLine
 
 		-- Select next real entry in 'pageLines'
 		if keyUpLogic or keyDownLogic then
@@ -132,9 +132,9 @@ function M.display()
 
 			-- Find next entry (containing leading dash)
 			while true do
-				if key == keys.down and currentSelect < displayLines then
+				if key == keys.down and currentSelect < endLine then
 					currentSelect = currentSelect + 1
-				elseif key == keys.up and currentSelect > 1 then
+				elseif key == keys.up and currentSelect > startLine then
 					currentSelect = currentSelect - 1
 				else
 					error("Could not find nearest bulletpoint!")
@@ -167,13 +167,6 @@ function M.display()
 		elseif key == keys.p and currentPage > 1 then
 			-- Scroll previous page
 			currentPage = currentPage - 1
-		end
-
-		-- Reset current selection on page scroll
-		if key == keys.n or key == keys.p then
-			pageLines[currentSelect] = " -" .. pageLines[currentSelect]:sub(3)
-			currentSelect = 1
-			pageLines[currentSelect] = " *" .. pageLines[currentSelect]:sub(3)
 		end
 	end
 end
