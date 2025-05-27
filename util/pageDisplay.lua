@@ -152,15 +152,10 @@ function M.display()
 			term.setCursorPos(1, 1)
 			break
 		elseif key == keys.enter then
-			-- Clear, run callback method and exit
-			term.clear()
-			term.setCursorPos(1, 1)
-
+			-- Run callback method and exit
 			local idx = callbackIndex[currentSelect]
 			local cbak = lineCallbacks[idx]
 			cbak()
-
-			break
 		elseif key == keys.n and currentPage < methodPages then
 			-- Scroll next page
 			currentPage = currentPage + 1
