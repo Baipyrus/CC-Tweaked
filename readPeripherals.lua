@@ -1,4 +1,4 @@
-local pageDisplay = require("util.pageDisplay")
+local PageDisplay = require("util.pageDisplay")
 
 ---@type table<string, string[]>, table<string, string[]>
 local pageLines, headerLines = {}, {}
@@ -32,10 +32,12 @@ for _, side in ipairs(sides) do
 
 	-- Push pager display callback for current side
 	table.insert(lineCallbacks, function ()
-		pageDisplay.setup("P. Methods", headerLines[side], pageLines[side])
-		pageDisplay.display()
+        local pd_sub = PageDisplay()
+		pd_sub.setup("P. Methods", headerLines[side], pageLines[side])
+		pd_sub.display()
 	end)
 end
 
-pageDisplay.setup("Peripherals", {}, sides, lineCallbacks)
-pageDisplay.display()
+local pd_main = PageDisplay()
+pd_main.setup("Peripherals", {}, sides, lineCallbacks)
+pd_main.display()
