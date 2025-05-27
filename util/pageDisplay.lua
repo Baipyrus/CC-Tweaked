@@ -158,6 +158,7 @@ local function inputHandler(currentSelect, currentPage, contentLength)
 
 	-- Reset current selection to nearest bulletpoint
 	if pageScrollFlag then
+		pageLines[currentSelect] = " -" .. pageLines[currentSelect]:sub(3)
 		currentSelect = key == keys.n and endLine or startLine
 
 		startLine, endLine = getPageIndecies(currentPage, contentLength, #pageLines)
