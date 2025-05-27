@@ -146,7 +146,10 @@ local function newPageDisplay()
 			-- Run callback method and exit
 			local idx = callbackIndex[currentSelect]
 			local cbak = lineCallbacks[idx]
-			cbak()
+
+			if cbak ~= nil then
+				cbak()
+			end
 		elseif key == keys.n and currentPage < contentPages then
 			-- Scroll next page
 			currentPage = currentPage + 1
