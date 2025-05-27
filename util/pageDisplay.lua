@@ -84,13 +84,16 @@ local function newPageDisplay()
 	---@param i integer The start index of a given range
 	---@param j integer The end index of a given range
 	local function calculateSelection(goUp, current, i, j)
+		local previous = current
+
 		while true do
 			if not goUp and current < j then
 				current = current + 1
 			elseif goUp and current > i then
 				current = current - 1
 			else
-				error("Could not find nearest bulletpoint!")
+				-- Could not find nearest bulletpoint
+				return previous
 			end
 
 			-- Only exit on valid entry
