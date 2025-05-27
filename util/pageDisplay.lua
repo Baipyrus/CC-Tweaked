@@ -107,6 +107,8 @@ end
 ---@param current integer Current page index
 ---@param length integer Length of page content
 ---@param total integer Total content lines available
+---@return integer j The start index of a given range
+---@return integer i The end index of a given range
 local function getPageIndecies(current, length, total)
 	local start = (current - 1) * length + 1
 	return start, math.min(start + length - 1, total)
