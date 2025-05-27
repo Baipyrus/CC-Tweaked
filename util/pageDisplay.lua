@@ -81,9 +81,6 @@ end
 ---@param i integer The start index of a given range
 ---@param j integer The end index of a given range
 local function calculateSelection(goUp, current, i, j)
-	pageLines[current] = " -" .. pageLines[current]:sub(3)
-
-	-- Find next entry (containing leading dash)
 	while true do
 		if not goUp and current < j then
 			current = current + 1
@@ -99,7 +96,6 @@ local function calculateSelection(goUp, current, i, j)
 		end
 	end
 
-	pageLines[current] = " *" .. pageLines[current]:sub(3)
 	return current
 end
 
@@ -134,7 +130,9 @@ local function inputHandler(currentSelect, currentPage, contentLength)
 
 	-- Select next real entry in 'pageLines'
 	if keyUpLogic or keyDownLogic then
+		pageLines[currentSelect] = " -" .. pageLines[currentSelect]:sub(3)
 		currentSelect = calculateSelection(keyUpLogic, currentSelect, startLine, endLine)
+		pageLines[currentSelect] = " *" .. pageLines[currentSelect]:sub(3)
 	elseif key == keys.q then
 		-- Quit current menu
 		term.clear()
@@ -163,6 +161,7 @@ local function inputHandler(currentSelect, currentPage, contentLength)
 
 		startLine, endLine = getPageIndecies(currentPage, contentLength, #pageLines)
 		currentSelect = calculateSelection(key == keys.p, currentSelect, startLine, endLine)
+		pageLines[currentSelect] = " *" .. pageLines[currentSelect]:sub(3)
 	end
 
 	return false, currentSelect, currentPage
