@@ -41,11 +41,11 @@ end
 local lineCallbacks = {
 	function()
 		manuallyDeactivated = true
-		reactor.scram()
+		pcall(reactor.scram)
 	end,
 	function()
 		manuallyDeactivated = false
-		reactor.activate()
+		pcall(reactor.activate)
 	end,
 }
 
@@ -73,10 +73,10 @@ local function reactor_logic()
 		local diffTime = os.clock() - deactivated
 
 		if isActive and (damaged or overheated or wasteFilled) then
-			reactor.scram()
+			pcall(reactor.scram)
 			deactivated = os.clock()
 		elseif not isActive and diffTime >= 60 and not manuallyDeactivated then
-			reactor.activate()
+			pcall(reactor.activate)
 		end
 	end
 end
