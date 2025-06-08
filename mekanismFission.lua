@@ -30,6 +30,13 @@ local pageLines = {
 -- Flag to denote manual scram. Does not reactivate
 local manuallyDeactivated = false
 
+---@param display table
+---@param status boolean
+local function update_status(display, status)
+	local s_txt = status and "On" or "Off"
+	display.headerLines[1] = "Status: " .. s_txt
+end
+
 ---@type function[]
 local lineCallbacks = {
 	function()
@@ -55,6 +62,7 @@ local function reactor_logic()
 
 	while not exit do
 		local isActive = reactor.getStatus()
+		update_status(pd_main, isActive)
 
 		-- Reactor scram conditions
 		local damaged = reactor.getDamagePercent() > 100
@@ -74,9 +82,6 @@ local function reactor_logic()
 end
 
 parallel.waitForAny(function()
-	local status = reactor.getStatus() and "On" or "Off"
-	pd_main.headerLines[0] = "Status: " .. status
-
 	pd_main.display()
 	exit = true
 end, reactor_logic)
