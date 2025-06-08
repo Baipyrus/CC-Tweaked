@@ -43,23 +43,8 @@ pd_main.setup("M. Fission Reactor", headerLines, pageLines, lineCallbacks)
 
 -- Locally global PageDisplay state
 local exit = false
-local currentPage = 1
-local currentSelect = 1
 
--- Set initial PageDisplay bulletpoint as selected
-pd_main.pageLines[currentSelect] = " *" .. pd_main.pageLines[currentSelect]:sub(3)
-
--- Display UI in a coroutine to parallelize logic
-local display_coroutine = coroutine.create(function()
-	while not exit do
-		-- Run a single "iteration" of the PageDisplay manually
-		exit, currentSelect, currentPage = pd_main.renderDisplay(currentSelect, currentPage)
-
-		coroutine.yield()
-	end
-end)
-
-local reactor_coroutine = coroutine.create(function()
+local function reactor_logic()
 	-- Keeping track of the scram time of reactor
 	local deactivated = 0
 
@@ -80,24 +65,10 @@ local reactor_coroutine = coroutine.create(function()
 		elseif not isActive and diffTime >= 60 then
 			reactor.activate()
 		end
-
-		-- Yield coroutine for parallelized logic
-		coroutine.yield()
-	end
-end)
-
--- Main event loop
-while not exit do
-	local display_dead = coroutine.status(display_coroutine) == "dead"
-	local reactor_dead = coroutine.status(reactor_coroutine) == "dead"
-
-	-- Resume display, if running
-	if not display_dead then
-		coroutine.resume(display_coroutine)
-	end
-
-	-- Resume reactor logic, if running
-	if not reactor_dead then
-		coroutine.resume(reactor_coroutine)
 	end
 end
+
+parallel.waitForAny(function()
+	pd_main.display()
+	exit = true
+end, reactor_logic)
