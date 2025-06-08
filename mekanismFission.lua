@@ -41,13 +41,22 @@ local lineCallbacks = {
 local pd_main = PageDisplay()
 pd_main.setup("M. Fission Reactor", headerLines, pageLines, lineCallbacks)
 
--- Exit condition for reactor logic
+-- Locally global PageDisplay state
 local exit = false
+local currentPage = 1
+local currentSelect = 1
+
+-- Set initial PageDisplay bulletpoint as selected
+pd_main.pageLines[currentSelect] = " *" .. pd_main.pageLines[currentSelect]:sub(3)
 
 -- Display UI in a coroutine to parallelize logic
 local display_coroutine = coroutine.create(function()
-	-- pd_main.display()
-	coroutine.yield()
+	while not exit do
+		-- Run a single "iteration" of the PageDisplay manually
+		exit, currentSelect, currentPage = pd_main.renderDisplay(currentSelect, currentPage)
+
+		coroutine.yield()
+	end
 end)
 
 local reactor_coroutine = coroutine.create(function()
