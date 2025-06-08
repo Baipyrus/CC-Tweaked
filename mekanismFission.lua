@@ -46,8 +46,8 @@ local exit = false
 
 -- Display UI in a coroutine to parallelize logic
 local display_coroutine = coroutine.create(function()
-	pd_main.display(true)
-	exit = true
+	-- pd_main.display()
+	coroutine.yield()
 end)
 
 local reactor_coroutine = coroutine.create(function()

@@ -223,10 +223,7 @@ local function newPageDisplay()
 		return inputHandler(currentSelect, currentPage, methodLines)
 	end
 
-	---@param shouldYield? boolean Yield after displaying as if in a coroutine
-	function self.display(shouldYield)
-		shouldYield = shouldYield or false
-
+	function self.display()
 		local currentPage = 1
 		local currentSelect = 1
 
@@ -243,11 +240,6 @@ local function newPageDisplay()
 			-- Exit if 'q' key down event detected
 			if exit then
 				break
-			end
-
-			-- Yield after display in coroutine
-			if shouldYield then
-				coroutine.yield()
 			end
 		end
 	end
