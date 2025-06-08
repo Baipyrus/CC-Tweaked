@@ -1,5 +1,4 @@
 ---Creates an independent instance of a page display
----@return table
 local function newPageDisplay()
 	local self = {}
 
