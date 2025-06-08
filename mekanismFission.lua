@@ -17,6 +17,11 @@ if reactor == nil then
 end
 
 ---@type string[]
+local headerLines = {
+	"Status: " .. (reactor.getStatus() and "On" or "Off"),
+}
+
+---@type string[]
 local pageLines = {
 	"scram",
 	"activate",
@@ -32,6 +37,24 @@ local lineCallbacks = {
 	end,
 }
 
+-- Initialize PageDisplay object for manual control
 local pd_main = PageDisplay()
-pd_main.setup("M. Fission Reactor", {}, pageLines, lineCallbacks)
-pd_main.display()
+pd_main.setup("M. Fission Reactor", headerLines, pageLines, lineCallbacks)
+
+-- Exit condition for reactor logic
+local exit = false
+
+-- Display UI in a coroutine to parallelize logic
+local display_coroutine = coroutine.create(function()
+	pd_main.display(true)
+	exit = true
+end)
+-- Main event loop
+while not exit do
+	local display_dead = coroutine.status(display_coroutine) == "dead"
+
+	-- Resume display, if running
+	if not display_dead then
+		coroutine.resume(display_coroutine)
+	end
+end
