@@ -27,12 +27,17 @@ local pageLines = {
 	"activate",
 }
 
+-- Flag to denote manual scram. Does not reactivate
+local manuallyDeactivated = false
+
 ---@type function[]
 local lineCallbacks = {
 	function()
+		manuallyDeactivated = true
 		reactor.scram()
 	end,
 	function()
+		manuallyDeactivated = false
 		reactor.activate()
 	end,
 }
@@ -62,7 +67,7 @@ local function reactor_logic()
 		if isActive and (damaged or overheated or wasteFilled) then
 			reactor.scram()
 			deactivated = os.clock()
-		elseif not isActive and diffTime >= 60 then
+		elseif not isActive and diffTime >= 60 and not manuallyDeactivated then
 			reactor.activate()
 		end
 	end
