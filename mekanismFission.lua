@@ -74,6 +74,9 @@ local function reactor_logic()
 end
 
 parallel.waitForAny(function()
+	local status = reactor.getStatus() and "On" or "Off"
+	pd_main.headerLines[0] = "Status: " .. status
+
 	pd_main.display()
 	exit = true
 end, reactor_logic)
