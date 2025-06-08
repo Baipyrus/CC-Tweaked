@@ -57,11 +57,11 @@ local function reactor_logic()
 		local wasteFilled = reactor.getWasteFilledPercentage() > 95
 
 		-- Cool-off period for reactor to recover during
-		local diffTime = os.difftime(os.time(), deactivated)
+		local diffTime = os.clock() - deactivated
 
 		if isActive and (damaged or overheated or wasteFilled) then
 			reactor.scram()
-			deactivated = os.time()
+			deactivated = os.clock()
 		elseif not isActive and diffTime >= 60 then
 			reactor.activate()
 		end
