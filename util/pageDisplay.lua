@@ -3,14 +3,11 @@ local function newPageDisplay()
 	local self = {}
 
 	-- Locally global variables
-	---@type integer, integer, integer
-	local width, height, linesPerPage
+	---@type integer, integer
+	local width, height
 
 	--@type string
 	local displayTitle
-
-	---@type string[], string[]
-	local headerLines, pageLines
 
 	---@type integer[], function[]
 	local callbackIndex, lineCallbacks
@@ -58,14 +55,14 @@ local function newPageDisplay()
 		width, height = term.getSize()
 
 		-- Subtract static content
-		linesPerPage = height - 4
+		self.linesPerPage = height - 4
 
 		-- Save display title
 		displayTitle = title
 
 		-- Wrap text lines if necessary
-		pageLines, callbackIndex = wrap_text_lines(content, true)
-		headerLines = wrap_text_lines(headers)
+		self.pageLines, callbackIndex = wrap_text_lines(content, true)
+		self.headerLines = wrap_text_lines(headers)
 
 		-- Save callback functions
 		lineCallbacks = callbacks or {}
@@ -96,7 +93,7 @@ local function newPageDisplay()
 			end
 
 			-- Only exit on valid entry
-			if pageLines[current]:startswith(" - ") then
+			if self.pageLines[current]:startswith(" - ") then
 				break
 			end
 		end
@@ -123,8 +120,8 @@ local function newPageDisplay()
 	---@return integer select The new selection index
 	---@return integer page The new page index
 	local function inputHandler(currentSelect, currentPage, contentLength)
-		local startLine, endLine = getPageIndecies(currentPage, contentLength, #pageLines)
-		local contentPages = math.ceil(#pageLines / contentLength)
+		local startLine, endLine = getPageIndecies(currentPage, contentLength, #self.pageLines)
+		local contentPages = math.ceil(#self.pageLines / contentLength)
 
 		---@type _, string
 		local _, key = os.pullEvent("key")
@@ -133,11 +130,11 @@ local function newPageDisplay()
 		local keyDownLogic = key == keys.down and currentSelect < endLine
 		local pageScrollFlag = false
 
-		-- Select next real entry in 'pageLines'
+		-- Select next real entry in 'self.pageLines'
 		if keyUpLogic or keyDownLogic then
-			pageLines[currentSelect] = " -" .. pageLines[currentSelect]:sub(3)
+			self.pageLines[currentSelect] = " -" .. self.pageLines[currentSelect]:sub(3)
 			currentSelect = calculateSelection(keyUpLogic, currentSelect, startLine, endLine)
-			pageLines[currentSelect] = " *" .. pageLines[currentSelect]:sub(3)
+			self.pageLines[currentSelect] = " *" .. self.pageLines[currentSelect]:sub(3)
 		elseif key == keys.q then
 			-- Quit current menu
 			term.clear()
@@ -164,12 +161,12 @@ local function newPageDisplay()
 
 		-- Reset current selection to nearest bulletpoint
 		if pageScrollFlag then
-			pageLines[currentSelect] = " -" .. pageLines[currentSelect]:sub(3)
+			self.pageLines[currentSelect] = " -" .. self.pageLines[currentSelect]:sub(3)
 			currentSelect = key == keys.n and endLine or startLine
 
-			startLine, endLine = getPageIndecies(currentPage, contentLength, #pageLines)
+			startLine, endLine = getPageIndecies(currentPage, contentLength, #self.pageLines)
 			currentSelect = calculateSelection(key == keys.p, currentSelect, startLine, endLine)
-			pageLines[currentSelect] = " *" .. pageLines[currentSelect]:sub(3)
+			self.pageLines[currentSelect] = " *" .. self.pageLines[currentSelect]:sub(3)
 		end
 
 		return false, currentSelect, currentPage
@@ -181,32 +178,32 @@ local function newPageDisplay()
 	---@return boolean exit Whether to quit page display
 	---@return integer select The new selection index
 	---@return integer page The new page index
-	local function renderDisplay(currentSelect, currentPage)
+	function self.renderDisplay(currentSelect, currentPage)
 		term.clear()
 		term.setCursorPos(1, 1)
 
 		-- Less spacing necessary if no headers provided
-		local headerSpacing = #headerLines > 0 and 2 or 1
+		local headerSpacing = #self.headerLines > 0 and 2 or 1
 		-- Replacing keymap legend on small screens
 		local legendLines = width >= 48 and 2 or 0
 
 		-- Variables for current peripheral display
-		local methodLines = linesPerPage - #headerLines - 1 - legendLines
-		local methodPages = math.ceil(#pageLines / methodLines)
+		local methodLines = self.linesPerPage - #self.headerLines - 1 - legendLines
+		local methodPages = math.ceil(#self.pageLines / methodLines)
 
 		-- Print global headers
 		print(displayTitle .. ": (Page " .. currentPage .. "/" .. methodPages .. ")")
 		print(string.rep("-", width))
 
-		if #headerLines > 0 then
+		if #self.headerLines > 0 then
 			-- Print headers of current peripheral
-			print(table.concat(headerLines, "\n"))
+			print(table.concat(self.headerLines, "\n"))
 			print()
 		end
 
 		-- Print current page content
-		local startLine, endLine = getPageIndecies(currentPage, methodLines, #pageLines)
-		print(table.concat(pageLines, "\n", startLine, endLine))
+		local startLine, endLine = getPageIndecies(currentPage, methodLines, #self.pageLines)
+		print(table.concat(self.pageLines, "\n", startLine, endLine))
 
 		-- Print global footers
 		local displayLines = endLine - startLine + headerSpacing
@@ -228,14 +225,14 @@ local function newPageDisplay()
 		local currentSelect = 1
 
 		-- Set initial bulletpoint as selected
-		pageLines[currentSelect] = " *" .. pageLines[currentSelect]:sub(3)
+		self.pageLines[currentSelect] = " *" .. self.pageLines[currentSelect]:sub(3)
 
 		-- Main loop: contains rendering, input logic and callbacks
 		while true do
 			local exit = false
 
 			-- Update select and page indecies
-			exit, currentSelect, currentPage = renderDisplay(currentSelect, currentPage)
+			exit, currentSelect, currentPage = self.renderDisplay(currentSelect, currentPage)
 
 			-- Exit if 'q' key down event detected
 			if exit then
