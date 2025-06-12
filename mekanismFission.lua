@@ -16,6 +16,17 @@ if reactor == nil then
 	error("Could not find Fission Reactor!")
 end
 
+print("Waiting for reactor to form ...")
+while not reactor.isFormed() or reactor["getStatus"] == nil do
+	os.sleep(0.1)
+
+	-- Reread reactor API methods
+	---@type FissionReactor?
+	---@diagnostic disable-next-line: param-type-mismatch, assign-type-mismatch
+	reactor = peripheral.find("fissionReactorLogicAdapter")
+	assert(reactor ~= nil, "Reactor disconnected!")
+end
+
 ---@type string[]
 local headerLines = {
 	"Status: " .. (reactor.getStatus() and "On" or "Off"),
