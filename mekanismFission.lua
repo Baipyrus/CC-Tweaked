@@ -4,6 +4,7 @@ local PageDisplay = require("util.pageDisplay")
 ---@field getStatus fun(): boolean
 ---@field scram function
 ---@field getDamagePercent function
+---@field getHeatedCoolantFilledPercentage fun(): integer
 ---@field isFormed fun(): boolean
 ---@field getWasteFilledPercentage fun(): integer
 ---@field activate function
@@ -79,11 +80,12 @@ local function reactor_logic()
 		local damaged = reactor.getDamagePercent() > 80
 		local overheated = reactor.getTemperature() > 1000
 		local wasteFilled = reactor.getWasteFilledPercentage() > 95
+		local heatedFilled = reactor.getHeatedCoolantFilledPercentage() > 0
 
 		-- Cool-off period for reactor to recover during
 		local diffTime = os.clock() - deactivated
 
-		if isActive and (damaged or overheated or wasteFilled) then
+		if isActive and (damaged or overheated or wasteFilled or heatedFilled) then
 			pcall(reactor.scram)
 			deactivated = os.clock()
 		elseif not isActive and diffTime >= 60 and not manuallyDeactivated then
