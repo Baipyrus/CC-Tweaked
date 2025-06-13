@@ -77,9 +77,9 @@ local function reactor_logic()
 		update_status(pd_main, isActive)
 
 		-- Reactor scram conditions
-		local damaged = reactor.getDamagePercent() > 80
+		local damaged = reactor.getDamagePercent() > 0.8
 		local overheated = reactor.getTemperature() > 1000
-		local wasteFilled = reactor.getWasteFilledPercentage() > 95
+		local wasteFilled = reactor.getWasteFilledPercentage() > 0.95
 		local heatedFilled = reactor.getHeatedCoolantFilledPercentage() > 0
 
 		-- Cool-off period for reactor to recover during
