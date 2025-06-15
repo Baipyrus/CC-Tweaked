@@ -206,13 +206,12 @@ local function reactor_logic()
 		-- Cool-off period for reactor to recover during
 		local diffTime = os.clock() - deactivated
 
-		-- Temporarily disabled because no conditions set
-		if isActive and false then
-			scram()
-			deactivated = os.clock()
-		elseif not isActive and diffTime >= 60 and not manuallyDeactivated and isReady then
-			activate()
-		end
+		-- if isActive and false then
+		-- 	scram()
+		-- 	deactivated = os.clock()
+		-- elseif not isActive and diffTime >= 60 and not manuallyDeactivated and isReady then
+		-- 	activate()
+		-- end
 	end
 end
 
