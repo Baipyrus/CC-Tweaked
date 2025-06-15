@@ -97,9 +97,13 @@ local manuallyDeactivated = false
 
 ---@param display table
 ---@param status boolean
-local function update_status(display, status)
+---@param ready boolean
+local function update_headers(display, status, ready)
 	local s_txt = status and "On" or "Off"
 	display.headerLines[1] = "Status: " .. s_txt
+
+	local r_txt = ready and "Yes" or "No"
+	display.headerLines[2] = "Ready: " .. r_txt
 end
 
 local function scram()
@@ -184,24 +188,31 @@ local function reactor_logic()
 	local deactivated = 0
 
 	while not exit do
-		-- local isActive = reactor.getStatus()
-		-- update_headers(pd_main, isActive)
-		--
-		-- -- Reactor scram conditions
+		local isReady = all_ready()
+		local isActive = (function()
+			for _, r in ipairs(reactors) do
+				if r.isIgnited() then
+					return true
+				end
+			end
+
+			return false
+		end)()
+		update_headers(pd_main, isActive, isReady)
+
+		-- Reactor scram conditions
 		-- local damaged = reactor.getDamagePercent() > 0.8
-		-- local overheated = reactor.getTemperature() > 1000
-		-- local wasteFilled = reactor.getWasteFilledPercentage() > 0.95
-		-- local heatedFilled = reactor.getHeatedCoolantFilledPercentage() > 0
-		--
-		-- -- Cool-off period for reactor to recover during
-		-- local diffTime = os.clock() - deactivated
-		--
-		-- if isActive and (damaged or overheated or wasteFilled or heatedFilled) then
-		-- 	pcall(reactor.scram)
-		-- 	deactivated = os.clock()
-		-- elseif not isActive and diffTime >= 60 and not manuallyDeactivated then
-		-- 	pcall(reactor.activate)
-		-- end
+
+		-- Cool-off period for reactor to recover during
+		local diffTime = os.clock() - deactivated
+
+		-- Temporarily disabled because no conditions set
+		if isActive and false then
+			scram()
+			deactivated = os.clock()
+		elseif not isActive and diffTime >= 60 and not manuallyDeactivated and isReady then
+			activate()
+		end
 	end
 end
 
