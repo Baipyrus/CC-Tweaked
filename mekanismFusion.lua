@@ -53,7 +53,7 @@ end
 
 ---@type QuantumEntangloporter[]
 ---@diagnostic disable-next-line: param-type-mismatch, assign-type-mismatch
-local porters = { peripheral.find("quantumEntangloporters") }
+local porters = { peripheral.find("quantumEntangloporter") }
 if #porters ~= #reactors then
 	error("# of entangloporters needs to equal # of reactors!")
 end
