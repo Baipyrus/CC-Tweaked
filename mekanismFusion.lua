@@ -1,16 +1,19 @@
 local PageDisplay = require("util.pageDisplay")
 
----@class FissionReactor
----@field getStatus fun(): boolean
----@field scram function
----@field getDamagePercent function
----@field getHeatedCoolantFilledPercentage fun(): integer
+---@class FusionReactorLogicAdapter
 ---@field isFormed fun(): boolean
----@field getWasteFilledPercentage fun(): integer
----@field activate function
----@field getTemperature fun(): integer
+---@field isIgnited fun(): boolean
 
----@type FissionReactor?
+---@class FusionReactorController
+---@field pullItems fun(): boolean
+
+---@class LaserAmplifier
+---@field setRedstoneMode fun(mode: "HIGH" | "LOW")
+
+---@class QuantumEntangloporter
+---@field setEjecting fun(type: "CHEMICAL", ejecting: boolean)
+
+---@type FusionReactorLogicAdapter[]
 ---@diagnostic disable-next-line: param-type-mismatch, assign-type-mismatch
 local reactor = peripheral.find("fissionReactorLogicAdapter")
 if reactor == nil then
@@ -22,7 +25,7 @@ while not reactor.isFormed() or reactor["getStatus"] == nil do
 	os.sleep(0.1)
 
 	-- Reread reactor API methods
-	---@type FissionReactor?
+	---@type FusionReactorLogicAdapter[]
 	---@diagnostic disable-next-line: param-type-mismatch, assign-type-mismatch
 	reactor = peripheral.find("fissionReactorLogicAdapter")
 	assert(reactor ~= nil, "Reactor disconnected!")
@@ -30,7 +33,8 @@ end
 
 ---@type string[]
 local headerLines = {
-	"Status: " .. (reactor.getStatus() and "On" or "Off"),
+	"Status: Off",
+	"Ready: No",
 }
 
 ---@type string[]
@@ -53,17 +57,17 @@ end
 local lineCallbacks = {
 	function()
 		manuallyDeactivated = true
-		pcall(reactor.scram)
+		-- pcall(reactor.scram)
 	end,
 	function()
 		manuallyDeactivated = false
-		pcall(reactor.activate)
+		-- pcall(reactor.activate)
 	end,
 }
 
 -- Initialize PageDisplay object for manual control
 local pd_main = PageDisplay()
-pd_main.setup("M. Fission Reactor", headerLines, pageLines, lineCallbacks)
+pd_main.setup("M. Fusion Reactor", headerLines, pageLines, lineCallbacks)
 
 -- Locally global PageDisplay state
 local exit = false
@@ -73,24 +77,24 @@ local function reactor_logic()
 	local deactivated = 0
 
 	while not exit do
-		local isActive = reactor.getStatus()
-		update_status(pd_main, isActive)
-
-		-- Reactor scram conditions
-		local damaged = reactor.getDamagePercent() > 0.8
-		local overheated = reactor.getTemperature() > 1000
-		local wasteFilled = reactor.getWasteFilledPercentage() > 0.95
-		local heatedFilled = reactor.getHeatedCoolantFilledPercentage() > 0
-
-		-- Cool-off period for reactor to recover during
-		local diffTime = os.clock() - deactivated
-
-		if isActive and (damaged or overheated or wasteFilled or heatedFilled) then
-			pcall(reactor.scram)
-			deactivated = os.clock()
-		elseif not isActive and diffTime >= 60 and not manuallyDeactivated then
-			pcall(reactor.activate)
-		end
+		-- local isActive = reactor.getStatus()
+		-- update_headers(pd_main, isActive)
+		--
+		-- -- Reactor scram conditions
+		-- local damaged = reactor.getDamagePercent() > 0.8
+		-- local overheated = reactor.getTemperature() > 1000
+		-- local wasteFilled = reactor.getWasteFilledPercentage() > 0.95
+		-- local heatedFilled = reactor.getHeatedCoolantFilledPercentage() > 0
+		--
+		-- -- Cool-off period for reactor to recover during
+		-- local diffTime = os.clock() - deactivated
+		--
+		-- if isActive and (damaged or overheated or wasteFilled or heatedFilled) then
+		-- 	pcall(reactor.scram)
+		-- 	deactivated = os.clock()
+		-- elseif not isActive and diffTime >= 60 and not manuallyDeactivated then
+		-- 	pcall(reactor.activate)
+		-- end
 	end
 end
 
