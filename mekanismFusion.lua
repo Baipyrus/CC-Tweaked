@@ -5,10 +5,12 @@ local PageDisplay = require("util.pageDisplay")
 ---@field isIgnited fun(): boolean
 
 ---@class FusionReactorController
----@field pullItems fun(): boolean
+---@field pullItems fun(fromName: string, fromSlot: number)
+---@field list fun(): ccTweaked.peripherals.inventory.itemList
 
 ---@class LaserAmplifier
 ---@field setRedstoneMode fun(mode: "HIGH" | "LOW")
+---@field getEnergyFilledPercentage fun(): integer
 
 ---@class QuantumEntangloporter
 ---@field setEjecting fun(type: "CHEMICAL", ejecting: boolean)
@@ -100,15 +102,73 @@ local function update_status(display, status)
 	display.headerLines[1] = "Status: " .. s_txt
 end
 
+local function scram()
+	for _, p in ipairs(porters) do
+		p.setEjecting("CHEMICAL", false)
+	end
+end
+
+local function all_ready()
+	for _, l in ipairs(lasers) do
+		if l.getEnergyFilledPercentage() ~= 1 then
+			return false
+		end
+	end
+
+	return #(hohlraum.list()) >= #reactors
+end
+
+local function activate()
+	if not all_ready() then
+		return
+	end
+
+	-- Insert Hohlraum
+	for _, c in ipairs(controllers) do
+		-- Hohlraum already inside controller
+		if #(c.list()) > 0 then
+			goto continue
+		end
+
+		-- Find next slot with hohlraum in it
+		local slot = -1
+		for s, item in pairs(hohlraum.list()) do
+			if item.name == "mekanismgenerators:hohlraum" then
+				slot = s
+				break
+			end
+		end
+
+		c.pullItems(peripheral.getName(hohlraum), slot)
+		::continue::
+	end
+
+	-- Inject fuel
+	for _, p in ipairs(porters) do
+		p.setEjecting("CHEMICAL", true)
+	end
+
+	-- Shoot lasers
+	for _, l in ipairs(lasers) do
+		l.setRedstoneMode("LOW")
+	end
+
+	-- Wait to disable lasers
+	os.sleep(1)
+	for _, l in ipairs(lasers) do
+		l.setRedstoneMode("HIGH")
+	end
+end
+
 ---@type function[]
 local lineCallbacks = {
 	function()
 		manuallyDeactivated = true
-		-- pcall(reactor.scram)
+		scram()
 	end,
 	function()
 		manuallyDeactivated = false
-		-- pcall(reactor.activate)
+		activate()
 	end,
 }
 
