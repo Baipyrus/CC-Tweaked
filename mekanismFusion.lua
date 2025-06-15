@@ -15,20 +15,67 @@ local PageDisplay = require("util.pageDisplay")
 
 ---@type FusionReactorLogicAdapter[]
 ---@diagnostic disable-next-line: param-type-mismatch, assign-type-mismatch
-local reactor = peripheral.find("fissionReactorLogicAdapter")
-if reactor == nil then
-	error("Could not find Fission Reactor!")
+local reactors = { peripheral.find("fusionReactorLogicAdapter") }
+if #reactors == 0 then
+	error("Could not find Fusion Reactor(-s)!")
 end
 
-print("Waiting for reactor to form ...")
-while not reactor.isFormed() or reactor["getStatus"] == nil do
+---@param rs FusionReactorLogicAdapter[]
+local function all_formed(rs)
+	for _, r in ipairs(rs) do
+		if not r.isFormed() or r["isIgnited"] == nil then
+			return false
+		end
+	end
+
+	return true
+end
+
+print("Waiting for reactors to form ...")
+while not all_formed(reactors) do
 	os.sleep(0.1)
 
 	-- Reread reactor API methods
 	---@type FusionReactorLogicAdapter[]
 	---@diagnostic disable-next-line: param-type-mismatch, assign-type-mismatch
-	reactor = peripheral.find("fissionReactorLogicAdapter")
-	assert(reactor ~= nil, "Reactor disconnected!")
+	reactors = { peripheral.find("fusionReactorLogicAdapter") }
+	assert(#reactors > 0, "Reactor(-s) disconnected!")
+end
+
+---@type LaserAmplifier[]
+---@diagnostic disable-next-line: param-type-mismatch, assign-type-mismatch
+local lasers = { peripheral.find("laserAmplifier") }
+if #lasers ~= #reactors then
+	error("# of lasers needs to equal # of reactors!")
+end
+
+---@type QuantumEntangloporter[]
+---@diagnostic disable-next-line: param-type-mismatch, assign-type-mismatch
+local porters = { peripheral.find("quantumEntangloporters") }
+if #porters ~= #reactors then
+	error("# of entangloporters needs to equal # of reactors!")
+end
+
+---@type FusionReactorController[]
+---@diagnostic disable-next-line: param-type-mismatch, assign-type-mismatch
+local controllers = { peripheral.find("mekanismgenerators:fusion_reactor_controller") }
+if #controllers ~= #reactors then
+	error("# of controllers needs to equal # of reactors!")
+end
+
+local hohlraum = peripheral.find("inventory", function(_, wrapped)
+	for _, item in pairs(wrapped.list()) do
+		-- Works for D-T Fuel filled Holhraum aswell
+		if item.name == "mekanismgenerators:hohlraum" then
+			return true
+		end
+	end
+
+	return false
+end)
+
+if hohlraum == nil then
+	error("No inventory containing D-T filled Hohlraum was found!")
 end
 
 ---@type string[]
