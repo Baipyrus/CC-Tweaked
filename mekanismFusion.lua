@@ -175,7 +175,7 @@ local lineCallbacks = {
 
 		rednet.open(peripheral.getName(modem))
 
-		pd_matrix.setup("Protocol Broadcasts", {}, { "None" })
+		pd_matrix.setup("Protocol Broadcasts", {"Searches every 15 seconds"}, { "None" })
 
 		local exit_listener = false
 
@@ -191,22 +191,28 @@ local lineCallbacks = {
 
 				protocols[p] = 1
 
+				::continue::
+			end
+		end
+
+        local function matrix_updater()
+            while not exit_listener do
 				---@type string[]
 				local p_keys = {}
 				for k, _ in pairs(protocols) do
 					table.insert(p_keys, k)
 				end
 
-				pd_matrix.setup("Protocol Broadcast", {}, p_keys)
+				pd_matrix.setup("Protocol Broadcast", {"Searches every 15 seconds"}, p_keys)
 
-				::continue::
-			end
-		end
+                os.sleep(15)
+            end
+        end
 
 		parallel.waitForAny(function()
 			pd_matrix.display()
 			exit_listener = true
-		end, matrix_listener)
+		end, matrix_listener, matrix_updater)
 	end,
 }
 
