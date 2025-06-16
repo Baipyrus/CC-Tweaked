@@ -190,7 +190,14 @@ local lineCallbacks = {
 				end
 
 				protocols[p] = 1
-				pd_matrix.setup("Protocol Broadcast", {}, protocols)
+
+				---@type string[]
+				local p_keys = {}
+				for k, _ in pairs(protocols) do
+					table.insert(p_keys, k)
+				end
+
+				pd_matrix.setup("Protocol Broadcast", {}, p_keys)
 
 				::continue::
 			end
