@@ -73,12 +73,14 @@ end
 local headerLines = {
 	"Status: Off",
 	"Ready: No",
+	"Mode: Manual",
 }
 
 ---@type string[]
 local pageLines = {
 	"scram",
 	"activate",
+	"Connect Matrix",
 }
 
 -- Flag to denote manual scram. Does not reactivate
@@ -162,6 +164,42 @@ local lineCallbacks = {
 	function()
 		manuallyDeactivated = false
 		activate()
+	end,
+	function()
+		local pd_matrix = PageDisplay()
+
+		local modem = peripheral.find("modem")
+		if modem == nil then
+			return
+		end
+
+		rednet.open(peripheral.getName(modem))
+
+		pd_matrix.setup("Protocol Broadcasts", {}, { "None" })
+
+		local exit_listener = false
+
+		---@type table<string, 1>
+		local protocols = {}
+
+		local function matrix_listener()
+			while not exit_listener do
+				local _, _, p = rednet.receive()
+				if p == nil then
+					goto continue
+				end
+
+				protocols[p] = 1
+				pd_matrix.setup("Protocol Broadcast", {}, protocols)
+
+				::continue::
+			end
+		end
+
+		parallel.waitForAny(function()
+			pd_matrix.display()
+			exit_listener = true
+		end, matrix_listener)
 	end,
 }
 
