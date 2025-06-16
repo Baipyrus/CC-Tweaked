@@ -186,19 +186,19 @@ local lineCallbacks = {
 			while not exit_listener do
 				local _, _, p = rednet.receive()
 				if p == nil then
-					goto continue
+					goto continue_listen
 				end
 
 				protocols[p] = 1
 
-				::continue::
+				::continue_listen::
 			end
 		end
 
 		local function matrix_updater()
 			while not exit_listener do
 				if #protocols == 0 then
-					goto continue
+					goto continue_update
 				end
 
 				---@type string[]
@@ -209,7 +209,7 @@ local lineCallbacks = {
 
 				pd_matrix.pageLines = p_keys
 
-				::continue::
+				::continue_update::
 				os.sleep(15)
 			end
 		end
