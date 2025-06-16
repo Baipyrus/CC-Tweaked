@@ -50,6 +50,7 @@ local function matrix_logic()
 		update_time(pd_main, uptime)
 
 		rednet.broadcast(matrix.getEnergyFilledPercentage(), protocol)
+		os.sleep(1)
 	end
 end
 
