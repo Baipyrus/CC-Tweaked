@@ -6,7 +6,7 @@ local function newPageDisplay()
 	---@type integer, integer
 	local width, height
 
-	--@type string
+	---@type string
 	local displayTitle
 
 	---@type integer[], function[]
