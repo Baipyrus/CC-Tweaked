@@ -195,19 +195,24 @@ local lineCallbacks = {
 			end
 		end
 
-        local function matrix_updater()
-            while not exit_listener do
+		local function matrix_updater()
+			while not exit_listener do
+				if #protocols == 0 then
+					goto continue
+				end
+
 				---@type string[]
 				local p_keys = {}
 				for k, _ in pairs(protocols) do
 					table.insert(p_keys, k)
 				end
 
-				pd_matrix.setup("Protocol Broadcast", {"Searches every 15 seconds"}, p_keys)
+				pd_matrix.pageLines = p_keys
 
-                os.sleep(15)
-            end
-        end
+				::continue::
+				os.sleep(15)
+			end
+		end
 
 		parallel.waitForAny(function()
 			pd_matrix.display()
