@@ -4,10 +4,6 @@ local PageDisplay = require("util.pageDisplay")
 ---@field isFormed fun(): boolean
 ---@field isIgnited fun(): boolean
 
----@class FusionReactorController
----@field pullItems fun(fromName: string, fromSlot: number)
----@field list fun(): ccTweaked.peripherals.inventory.itemList
-
 ---@class LaserAmplifier
 ---@field setRedstoneMode fun(mode: "HIGH" | "LOW")
 ---@field getEnergyFilledPercentage fun(): integer
@@ -58,26 +54,19 @@ if #porters ~= #reactors then
 	error("# of entangloporters needs to equal # of reactors!")
 end
 
----@type FusionReactorController[]
+---@type ccTweaked.peripherals.Inventory[]
 ---@diagnostic disable-next-line: param-type-mismatch, assign-type-mismatch
-local controllers = { peripheral.find("mekanismgenerators:fusion_reactor_controller") }
+local controllers = { peripheral.find("minecraft:barrel") }
 if #controllers ~= #reactors then
-	error("# of controllers needs to equal # of reactors!")
+	error("# of barrels needs to equal # of reactors! One barrel per controller.")
 end
 
-local hohlraum = peripheral.find("inventory", function(_, wrapped)
-	for _, item in pairs(wrapped.list()) do
-		-- Works for D-T Fuel filled Holhraum aswell
-		if item.name == "mekanismgenerators:hohlraum" then
-			return true
-		end
-	end
-
-	return false
-end)
+---@type ccTweaked.peripherals.Inventory
+---@diagnostic disable-next-line: param-type-mismatch, assign-type-mismatch
+local hohlraum = peripheral.find("minecraft:chest")
 
 if hohlraum == nil then
-	error("No inventory containing D-T filled Hohlraum was found!")
+	error("You must place a chest to put D-T Hohlraum into!")
 end
 
 ---@type string[]
