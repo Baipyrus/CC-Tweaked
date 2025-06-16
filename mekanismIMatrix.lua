@@ -3,6 +3,9 @@ local PageDisplay = require("util.pageDisplay")
 ---@class InductionMatrix
 ---@field getEnergyFilledPercentage fun(): number
 
+-- Startup time, in seconds, to keep track of broadcast uptime
+local startup = math.floor(os.clock())
+
 ---@type InductionMatrix
 ---@diagnostic disable-next-line: param-type-mismatch, assign-type-mismatch
 local matrix = peripheral.find("inductionPort")
@@ -32,7 +35,7 @@ local pageLines = {
 ---@param time integer
 local function update_time(display, time)
 	local u_txt = time .. " sec."
-	display.pageLines[2] = "Uptime: " .. u_txt
+	display.pageLines[2] = " - Uptime: " .. u_txt
 end
 
 local pd_main = PageDisplay()
@@ -43,7 +46,7 @@ local exit = false
 
 local function matrix_logic()
 	while not exit do
-		local uptime = math.floor(os.clock())
+		local uptime = math.floor(os.clock()) - startup
 		update_time(pd_main, uptime)
 
 		rednet.broadcast(matrix.getEnergyFilledPercentage(), protocol)
