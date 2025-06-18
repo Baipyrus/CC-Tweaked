@@ -94,12 +94,17 @@ local manuallyDeactivated = false
 ---@param display table
 ---@param status boolean
 ---@param ready boolean
-local function update_headers(display, status, ready)
+---@param mode string?
+local function update_headers(display, status, ready, mode)
 	local s_txt = status and "On" or "Off"
 	display.headerLines[1] = "Status: " .. s_txt
 
 	local r_txt = ready and "Yes" or "No"
 	display.headerLines[2] = "Ready: " .. r_txt
+
+	if mode ~= nil then
+		display.headerLines[3] = mode
+	end
 end
 
 local function scram()
@@ -182,7 +187,7 @@ local lineCallbacks = {
 		local pd_matrix = PageDisplay()
 		rednet.open(peripheral.getName(modem))
 
-		pd_matrix.setup("Protocol Broadcasts", {"Searches every 5 seconds"}, { "None" })
+		pd_matrix.setup("Protocol Broadcasts", { "Searches every 5 seconds" }, { "None" })
 
 		local exit_listener = false
 
@@ -202,7 +207,7 @@ local lineCallbacks = {
 				---@type string[], function[]
 				local p_keys, p_select = {}, {}
 				for k, _ in pairs(protocols) do
-					table.insert(p_keys, " - " .. k)
+					table.insert(p_keys, k)
 					table.insert(p_select, function ()
 						protocol = k
 						exit_listener = true
@@ -254,7 +259,7 @@ local function reactor_logic()
 
 			return false
 		end)()
-		update_headers(pd_main, isActive, isReady)
+		update_headers(pd_main, isActive, isReady, protocol and ("Protocol: " .. protocol) or nil)
 
 		-- Skip automation if no modem is connected or set up
 		if modem == nil or not rednet.isOpen(peripheral.getName(modem)) or protocol == nil then
