@@ -235,6 +235,10 @@ pd_main.setup("M. Fusion Reactor", headerLines, pageLines, lineCallbacks)
 -- Locally global PageDisplay state
 local exit = false
 
+-- Redstone output variables to prepare lasers
+local sides = {"right", "bottom", "left", "top"}
+local redstoneMode = false
+
 local function reactor_logic()
 	-- Keeping track of the scram time of reactor
 	local deactivated = 0
@@ -255,6 +259,17 @@ local function reactor_logic()
 		-- Skip automation if no modem is connected or set up
 		if modem == nil or not rednet.isOpen(peripheral.getName(modem)) or protocol == nil then
 			goto continue
+		end
+
+		-- Automate redstone output to prepare lasers
+		if not isReady and not redstoneMode then
+			for _, s in ipairs(sides) do
+				redstone.setOutput(s, true)
+			end
+		elseif isReady then
+			for _, s in ipairs(sides) do
+				redstone.setOutput(s, false)
+			end
 		end
 
 		-- Reactor scram conditions
