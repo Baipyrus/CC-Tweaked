@@ -155,6 +155,9 @@ local function activate()
 	end
 end
 
+---@type string|nil
+local protocol = nil
+
 ---@type function[]
 local lineCallbacks = {
 	function()
@@ -192,17 +195,22 @@ local lineCallbacks = {
 				protocols[p] = 1
 				::continue_update::
 
-				---@type string[]
-				local p_keys = {}
+				---@type string[], function[]
+				local p_keys, p_select = {}, {}
 				for k, _ in pairs(protocols) do
-					table.insert(p_keys, k)
+					table.insert(p_keys, " - " .. k)
+					table.insert(p_select, function ()
+						protocol = k
+						exit_listener = true
+					end)
 				end
 
 				if #p_keys == 0 then
 					goto continue_listen
 				end
 
-				pd_matrix.pageLines = p_keys
+				pd_matrix.setup("Protocol Broadcasts", {"Searches every 5 seconds"}, p_keys, p_select)
+				pd_matrix.pageLines[1] = " *" .. pd_matrix.pageLines[1]:sub(3)
 
 				::continue_listen::
 				os.sleep(5)
