@@ -69,6 +69,11 @@ if hohlraum == nil then
 	error("You must place a chest to put D-T Hohlraum into!")
 end
 
+local modem = peripheral.find("modem")
+if modem == nil then
+	print("No modem connected. Automatic reactor control is disabled.")
+end
+
 ---@type string[]
 local headerLines = {
 	"Status: Off",
@@ -169,13 +174,12 @@ local lineCallbacks = {
 		activate()
 	end,
 	function()
-		local pd_matrix = PageDisplay()
-
-		local modem = peripheral.find("modem")
-		if modem == nil then
+		-- Ignore if already selected or no modem
+		if protocol ~= nil or modem == nil then
 			return
 		end
 
+		local pd_matrix = PageDisplay()
 		rednet.open(peripheral.getName(modem))
 
 		pd_matrix.setup("Protocol Broadcasts", {"Searches every 5 seconds"}, { "None" })
@@ -248,18 +252,26 @@ local function reactor_logic()
 		end)()
 		update_headers(pd_main, isActive, isReady)
 
+		-- Skip automation if no modem is connected or set up
+		if modem == nil or not rednet.isOpen(peripheral.getName(modem)) or protocol == nil then
+			goto continue
+		end
+
 		-- Reactor scram conditions
-		-- local damaged = reactor.getDamagePercent() > 0.8
+		local _, msg = rednet.receive(protocol)
+		local energyFilled = type(msg) == "number" and msg > 0.95
 
 		-- Cool-off period for reactor to recover during
 		local diffTime = os.clock() - deactivated
 
-		-- if isActive and false then
-		-- 	scram()
-		-- 	deactivated = os.clock()
-		-- elseif not isActive and diffTime >= 60 and not manuallyDeactivated and isReady then
-		-- 	activate()
-		-- end
+		if isActive and energyFilled then
+			scram()
+			deactivated = os.clock()
+		elseif not isActive and diffTime >= 60 and not manuallyDeactivated and isReady then
+			activate()
+		end
+
+		::continue::
 	end
 end
 
