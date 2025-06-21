@@ -255,12 +255,12 @@ local function reactor_logic()
 		local isReady = all_ready()
 		local isActive = (function()
 			for _, r in ipairs(reactors) do
-				if r.isIgnited() then
-					return true
+				if not r.isIgnited() then
+					return false
 				end
 			end
 
-			return false
+			return true
 		end)()
 		update_headers(pd_main, isActive, isReady, protocol and ("Protocol: " .. protocol) or nil)
 
