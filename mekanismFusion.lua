@@ -69,8 +69,8 @@ if hohlraum == nil then
 	error("You must place a chest to put D-T Hohlraum into!")
 end
 
-local modem = peripheral.find("modem")
-if modem == nil then
+local modems = { peripheral.find("modem") }
+if #modems == 0 then
 	print("No modem connected. Automatic reactor control is disabled.")
 end
 
@@ -180,12 +180,15 @@ local lineCallbacks = {
 	end,
 	function()
 		-- Ignore if already selected or no modem
-		if protocol ~= nil or modem == nil then
+		if protocol ~= nil or #modems == 0 then
 			return
 		end
 
 		local pd_matrix = PageDisplay()
-		rednet.open(peripheral.getName(modem))
+
+		for _, m in ipairs(modems) do
+			rednet.open(peripheral.getName(m))
+		end
 
 		pd_matrix.setup("Protocol Broadcasts", { "Searches every 5 seconds" }, { "None" })
 
@@ -262,7 +265,13 @@ local function reactor_logic()
 		update_headers(pd_main, isActive, isReady, protocol and ("Protocol: " .. protocol) or nil)
 
 		-- Skip automation if no modem is connected or set up
-		if modem == nil or not rednet.isOpen(peripheral.getName(modem)) or protocol == nil then
+		local allOpen = (function ()
+			for _, m in ipairs(modems) do
+				rednet.isOpen(peripheral.getName(m))
+			end
+		end)()
+
+		if #modems == 0 or not allOpen or protocol == nil then
 			goto continue
 		end
 
