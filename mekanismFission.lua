@@ -88,6 +88,8 @@ local function reactor_logic()
 		if isActive and (damaged or overheated or wasteFilled or heatedFilled) then
 			pcall(reactor.scram)
 			deactivated = os.clock()
+		elseif isActive and manuallyDeactivated then
+			manuallyDeactivated = false
 		elseif not isActive and diffTime >= 60 and not manuallyDeactivated then
 			pcall(reactor.activate)
 		end
